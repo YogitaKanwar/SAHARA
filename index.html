@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PawAlert – Working Prototype</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f6fb;--card:#fff;--ink:#1b2a5c;--txt:#374151;--mut:#6b7280;--line:#d9deea;--acc:#f28c28;--ok:#166534;--okbg:#dcfce7;--warn:#9a3412;--warnbg:#ffedd5;--info:#1e40af;--infobg:#dbeafe;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1530;--card:#1a2350;--ink:#e8ecfa;--txt:#c9d2ec;--mut:#9aa6c9;--line:#2c3870;--okbg:#14391f;--ok:#86efac;--warnbg:#4a2a0c;--warn:#fdba74;--infobg:#1b2d63;--info:#93c5fd;color-scheme:dark}}
+*,*:before,*:after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+header{background:#1b2a5c;color:#fff;padding:14px 16px 0;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#1b2a5c;z-index:10}
+.brand{display:flex;align-items:center;gap:10px;max-width:980px;margin:0 auto}
+.brand b{font-size:20px}.brand small{color:#f28c28;letter-spacing:2px;font-weight:700;font-size:11px;display:block}
+.demo{margin-left:auto;font-size:12px;background:#f28c28;color:#1b2a5c;padding:3px 10px;border-radius:12px;font-weight:700}
+nav{display:flex;gap:6px;max-width:980px;margin:10px auto 0;overflow-x:auto}
+nav button{flex:1;min-width:110px;background:transparent;color:#c9d2ec;border:0;padding:10px 8px;font:inherit;font-weight:700;border-radius:10px 10px 0 0;cursor:pointer}
+nav button.on{background:var(--bg);color:var(--ink)}
+nav .n{background:#f28c28;color:#1b2a5c;border-radius:10px;padding:0 7px;font-size:12px;margin-left:4px}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 4px;color:var(--ink);font-size:20px}h3{margin:0 0 6px;color:var(--ink);font-size:16px}
+.sub{color:var(--mut);margin:0 0 12px}
+.seg{display:flex;gap:8px;margin-bottom:12px}
+.seg button,.chip{border:2px solid var(--line);background:var(--card);color:var(--txt);border-radius:12px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}
+.seg button{flex:1}
+.seg button.on,.chip.on{background:#1b2a5c;color:#fff;border-color:#1b2a5c}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.chip{padding:7px 12px;border-radius:20px;font-size:14px}
+label.l{display:block;font-weight:700;color:var(--ink);margin:10px 0 4px}
+input[type=text],textarea{width:100%;border:2px solid var(--line);background:var(--card);color:var(--txt);border-radius:12px;padding:10px;font:inherit}
+.photo{border:2px dashed var(--line);border-radius:14px;min-height:150px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--mut);cursor:pointer;overflow:hidden;position:relative}
+.photo img{width:100%;max-height:260px;object-fit:cover;display:block}
+.btn{background:#f28c28;color:#1b2a5c;border:0;border-radius:12px;padding:12px 18px;font:inherit;font-weight:800;cursor:pointer}
+.btn.s{background:#1b2a5c;color:#fff}.btn.g{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-block;font-size:12px;font-weight:800;padding:3px 10px;border-radius:12px}
+.t-o{background:var(--warnbg);color:var(--warn)}.t-i{background:var(--infobg);color:var(--info)}.t-k{background:var(--okbg);color:var(--ok)}
+.case{display:grid;grid-template-columns:110px 1fr;gap:12px}
+.case img,.ph{width:110px;height:110px;border-radius:12px;object-fit:cover;background:var(--line)}
+.tl{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.tl span{font-size:12px;font-weight:700;padding:3px 9px;border-radius:10px;background:var(--line);color:var(--mut)}
+.tl span.d{background:#f28c28;color:#1b2a5c}
+.tips{background:var(--infobg);color:var(--info);border-radius:12px;padding:10px 14px;margin:8px 0}
+.tips ul{margin:4px 0 0;padding-left:18px}
+.log{font-size:12px;color:var(--mut);margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:26px;color:var(--ink)}.stat span{font-size:12px;color:var(--mut)}
+.empty{text-align:center;color:var(--mut);padding:24px}
+.note{font-size:12px;color:var(--mut)}
+@media (max-width:520px){.case{grid-template-columns:84px 1fr}.case img,.ph{width:84px;height:84px}}
+</style></head><body>
+<header><div class="brand"><div><small>PAWALERT</small><b>One-tap rescue for street animals</b></div><span class="demo">PROTOTYPE · demo data</span></div>
+<nav id="nav"></nav></header>
+<main id="app"></main>
+<script>
+var S={tab:'citizen',kind:'injured',animal:'Dog',cond:[],loc:null,locTxt:'',note:'',photo:null,cases:[],nid:1043,msg:''};
+var CONDS=['Hit by vehicle','Bleeding','Cannot move','Limping','Looks weak','Aggressive / scared'];
+var ANIMALS=['Dog','Cat','Cow / cattle','Bird','Other'];
+var NGOS=['Sample Animal Rescue NGO','Sample Vet Hospital','Sample Vet Clinic'];
+var TEAMS=['Sanitation Team A','Sanitation Team B'];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function now(){return new Date()}
+function ft(d){return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function mins(a,b){return Math.max(1,Math.round((b-a)/60000))}
+function seed(){var t=now().getTime();
+S.cases=[
+{id:1041,kind:'injured',animal:'Dog',cond:['Hit by vehicle','Cannot move'],locTxt:'Near Pimpri Chowk, Pune (sample)',note:'Lying on the road edge',photo:null,status:'reported',created:t-6*60000,log:[[t-6*60000,'Reported by citizen']]},
+{id:1042,kind:'dead',animal:'Cow / cattle',cond:[],locTxt:'Nigdi Bus Stop road, PCMC (sample)',note:'On service road',photo:null,status:'reported',created:t-50*60000,log:[[t-50*60000,'Reported by citizen']]}];}
+function tips(c){var l=['Keep a safe distance first. A scared animal may bite.','Keep traffic and crowds away, and stay where you can see the animal.','Do not give food or water.'];
+if(c.cond.indexOf('Hit by vehicle')>-1||c.cond.indexOf('Cannot move')>-1)l.push('Do not lift or drag the animal unless it is in immediate danger. It may have a spine or limb injury.');
+if(c.cond.indexOf('Bleeding')>-1)l.push('If it is safe, cover the wound with a clean cloth. Do not press hard or remove anything stuck in it.');
+if(c.cond.indexOf('Aggressive / scared')>-1)l.push('Do not touch or corner it. Wait for trained rescuers.');
+if(c.animal==='Cow / cattle')l.push('Large animals can kick. Do not approach from behind.');
+l.push('Share the case number with the rescuer and keep your phone on.');return l}
+function geo(){S.msg='Detecting location…';render();
+var done=function(lat,lng,t){S.loc=[lat,lng];S.locTxt=t;S.msg='';render()};
+var fb=function(){done(18.6298,73.7997,'Pimpri, Pune (demo default, location not available)')};
+try{navigator.geolocation.getCurrentPosition(function(p){done(p.coords.latitude,p.coords.longitude,'GPS '+p.coords.latitude.toFixed(4)+', '+p.coords.longitude.toFixed(4))},fb,{timeout:6000})}catch(e){fb()}}
+function readPhoto(file,cb){if(!file)return;var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var m=520,s=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.7))};im.src=r.result};r.readAsDataURL(file)}
+function pick(cb){var i=document.createElement('input');i.type='file';i.accept='image/*';i.setAttribute('capture','environment');i.onchange=function(){readPhoto(i.files[0],cb)};i.click()}
+function submit(){var t=now().getTime();var c={id:S.nid++,kind:S.kind,animal:S.animal,cond:S.kind==='injured'?S.cond.slice():[],locTxt:S.locTxt,loc:S.loc,note:S.note,photo:S.photo,status:'reported',created:t,log:[[t,'Reported by citizen with photo and location']]};
+S.cases.unshift(c);S.photo=null;S.cond=[];S.note='';S.msg='Case #'+c.id+(c.kind==='injured'?' sent to nearby NGOs and vets.':' sent to the municipal body.');render()}
+function act(id,what){var c=S.cases.filter(function(x){return x.id===id})[0],t=now().getTime();
+if(what==='accept'){var who=document.getElementById('who'+id).value;c.status='accepted';c.by=who;c.acc=t;c.log.push([t,'Accepted by '+who+'. Other rescuers notified the case is taken.'])}
+if(what==='assign'){var tm=document.getElementById('who'+id).value;c.status='assigned';c.by=tm;c.acc=t;c.log.push([t,'Assigned to '+tm])}
+if(what==='proof'){pick(function(d){c.proof=d;c.status='closed';c.done=now().getTime();c.log.push([c.done,(c.kind==='injured'?'Treatment':'Clearance')+' completed. Photo proof uploaded. Case closed.']);render()});return}
+render()}
+function steps(c){var a=c.kind==='injured'?['Reported','Accepted','Treated · proof']:['Reported','Assigned','Cleared · proof'];var n={reported:1,accepted:2,assigned:2,closed:3}[c.status];
+return '<div class="tl">'+a.map(function(x,i){return '<span class="'+(i<n?'d':'')+'">'+(i<n?'✓ ':'')+x+'</span>'}).join('')+'</div>'}
+function caseCard(c,role){var st=c.status==='closed'?'<span class="tag t-k">CLOSED</span>':c.status==='reported'?'<span class="tag t-o">OPEN</span>':'<span class="tag t-i">IN PROGRESS</span>';
+var img=c.photo?'<img alt="Case photo" src="'+c.photo+'">':'<div class="ph"></div>';
+var h='<div class="card"><div class="case">'+img+'<div><div class="row"><b>#'+c.id+' · '+(c.kind==='injured'?'Injured ':'Dead ')+esc(c.animal)+'</b>'+st+'</div><div class="note">'+esc(c.locTxt||'Location not shared')+' · '+ft(new Date(c.created))+'</div>';
+if(c.cond&&c.cond.length)h+='<div class="note">Condition: '+esc(c.cond.join(', '))+'</div>';
+if(c.note)h+='<div class="note">Note: '+esc(c.note)+'</div>';h+='</div></div>'+steps(c);
+if(c.kind==='injured'&&c.status!=='closed'&&role==='citizen')h+='<div class="tips"><b>AI first-aid guidance (rule-based demo)</b><ul>'+tips(c).map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><div class="note">General guidance only, not veterinary advice.</div></div>';
+if(role==='ngo'&&c.kind==='injured'){
+if(c.status==='reported')h+='<div class="tips"><b>Suggested first-aid shared with citizen</b><ul>'+tips(c).slice(0,3).map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div><div class="row"><select id="who'+c.id+'">'+NGOS.map(function(n){return '<option>'+n+'</option>'}).join('')+'</select><button class="btn" onclick="act('+c.id+',\'accept\')">Accept case</button></div>';
+if(c.status==='accepted')h+='<div class="row"><span>Accepted by <b>'+esc(c.by)+'</b></span><button class="btn s" onclick="act('+c.id+',\'proof\')">Upload treatment proof and close</button></div>'}
+if(role==='muni'&&c.kind==='dead'){
+if(c.status==='reported')h+='<div class="row"><select id="who'+c.id+'">'+TEAMS.map(function(n){return '<option>'+n+'</option>'}).join('')+'</select><button class="btn" onclick="act('+c.id+',\'assign\')">Assign team</button></div>';
+if(c.status==='assigned')h+='<div class="row"><span>Assigned: <b>'+esc(c.by)+'</b></span><button class="btn s" onclick="act('+c.id+',\'proof\')">Upload clearance proof and close</button></div>';
+if(c.status!=='closed'){var sla=24*60,el=mins(c.created,now().getTime()),left=sla-el;h+='<div class="note">Clearance timer (24 h demo target): '+(left>0?Math.floor(left/60)+' h '+left%60+' min left':'<b>overdue</b>')+'</div>'}}
+if(c.proof)h+='<div class="note" style="margin-top:8px">Proof photo:</div><img alt="Proof photo" src="'+c.proof+'" style="max-width:220px;border-radius:12px">';
+h+='<div class="log">'+c.log.map(function(l){return ft(new Date(l[0]))+' – '+esc(l[1])}).join('<br>')+'</div></div>';return h}
+function citizen(){var inj=S.kind==='injured';
+var h='<div class="card"><h2>Report an animal</h2><p class="sub">Take a photo, share location, send. Takes under a minute.</p>';
+if(S.msg)h+='<div class="tips"><b>'+esc(S.msg)+'</b></div>';
+h+='<div class="seg"><button class="'+(inj?'on':'')+'" onclick="S.kind=\'injured\';render()">Injured animal</button><button class="'+(!inj?'on':'')+'" onclick="S.kind=\'dead\';render()">Dead animal</button></div>';
+h+='<label class="l">1. Photo</label><div class="photo" onclick="pick(function(d){S.photo=d;render()})">'+(S.photo?'<img alt="Your photo" src="'+S.photo+'">':'Tap to take or choose a photo')+'</div>';
+h+='<label class="l">2. Animal</label><div class="chips">'+ANIMALS.map(function(a){return '<button class="chip '+(S.animal===a?'on':'')+'" onclick="S.animal=\''+a+'\';render()">'+a+'</button>'}).join('')+'</div>';
+if(inj)h+='<label class="l">3. What do you see? (optional)</label><div class="chips">'+CONDS.map(function(a,i){var on=S.cond.indexOf(a)>-1;return '<button class="chip '+(on?'on':'')+'" onclick="var k=S.cond.indexOf(CONDS['+i+']);if(k>-1)S.cond.splice(k,1);else S.cond.push(CONDS['+i+']);render()">'+a+'</button>'}).join('')+'</div>';
+h+='<label class="l">'+(inj?'4':'3')+'. Location</label><div class="row"><button class="btn g" onclick="geo()">Use my location</button><span class="note">'+esc(S.locTxt||'Not set yet')+'</span></div>';
+h+='<label class="l">Landmark or note (optional)</label><textarea rows="2" id="note" oninput="S.note=this.value" placeholder="e.g. near the bus stop">'+esc(S.note)+'</textarea>';
+h+='<div style="margin-top:14px"><button class="btn" '+(S.photo&&S.locTxt?'':'disabled')+' onclick="submit()">'+(inj?'Send alert to nearby rescuers':'Send to municipal body')+'</button> <span class="note">'+(S.photo&&S.locTxt?'':'Add a photo and location to send')+'</span></div></div>';
+h+='<h2 style="margin:18px 0 8px">Your cases</h2>';var mine=S.cases;h+=mine.length?mine.map(function(c){return caseCard(c,'citizen')}).join(''):'<div class="empty">No cases yet.</div>';return h}
+function ngo(){var inj=S.cases.filter(function(c){return c.kind==='injured'});var op=inj.filter(function(c){return c.status==='reported'}).length;
+var h='<div class="stats"><div class="stat"><b>'+op+'</b><span>Open alerts nearby</span></div><div class="stat"><b>'+inj.filter(function(c){return c.status==='accepted'}).length+'</b><span>In progress</span></div><div class="stat"><b>'+inj.filter(function(c){return c.status==='closed'}).length+'</b><span>Closed with proof</span></div></div>';
+h+='<p class="sub">Rescuer view: alerts from citizens appear here instantly. The first to accept takes the case.</p>';return h+(inj.length?inj.map(function(c){return caseCard(c,'ngo')}).join(''):'<div class="empty">No alerts yet. Report one from the Citizen tab.</div>')}
+function muni(){var d=S.cases.filter(function(c){return c.kind==='dead'}),cl=d.filter(function(c){return c.status==='closed'});
+var avg=cl.length?Math.round(cl.reduce(function(s,c){return s+mins(c.created,c.done)},0)/cl.length)+' min':'–';
+var h='<div class="stats"><div class="stat"><b>'+d.filter(function(c){return c.status!=='closed'}).length+'</b><span>Open reports</span></div><div class="stat"><b>'+cl.length+'</b><span>Cleared with proof</span></div><div class="stat"><b>'+avg+'</b><span>Avg. time to clear</span></div></div>';
+h+='<p class="sub">Municipal dashboard: reports arrive geotagged and sorted, with a clearance timer and a photo-proof audit trail.</p>';return h+(d.length?d.map(function(c){return caseCard(c,'muni')}).join(''):'<div class="empty">No dead-animal reports yet.</div>')}
+function render(){var nI=S.cases.filter(function(c){return c.kind==='injured'&&c.status==='reported'}).length,nD=S.cases.filter(function(c){return c.kind==='dead'&&c.status!=='closed'}).length;
+var T=[['citizen','Citizen app',0],['ngo','NGO / Vet',nI],['muni','Municipal',nD]];
+document.getElementById('nav').innerHTML=T.map(function(t){return '<button class="'+(S.tab===t[0]?'on':'')+'" onclick="S.tab=\''+t[0]+'\';S.msg=\'\';render()">'+t[1]+(t[2]?'<span class="n">'+t[2]+'</span>':'')+'</button>'}).join('');
+var a=document.activeElement,keep=a&&a.id==='note';
+document.getElementById('app').innerHTML=(S.tab==='citizen'?citizen():S.tab==='ngo'?ngo():muni())+'<p class="note">Prototype for demonstration. Cases, NGOs and teams shown are sample data. AI tips are rule-based placeholders; the planned product would use an image model. Data lives in this browser tab only.</p>';
+if(keep){var n=document.getElementById('note');n.focus();n.setSelectionRange(n.value.length,n.value.length)}}
+seed();render();setInterval(function(){if(S.tab==='muni'&&document.activeElement.tagName!=='SELECT')render()},60000);
+</script></body></html>
