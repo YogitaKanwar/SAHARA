@@ -1,0 +1,4 @@
+# Local document generation dependencies, renders, and scratch files
+/tmp/
+__pycache__/
+*.py[cod]
